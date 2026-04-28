@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  # The Nexus-Insure API (Mock/Backend)
+  api:
+    image: nginx:alpine # Using a lightweight proxy as a placeholder
+    container_name: nexus_api
+    ports:
+      - "8080:80"
+    networks:
+      - nexus_net
+
+  # The Customer Portal (Mock/Frontend)
+  portal:
+    image: nginx:alpine
+    container_name: nexus_ui
+    ports:
+      - "3000:80"
+    networks:
+      - nexus_net
+
+networks:
+  nexus_net:
+    driver: bridge
