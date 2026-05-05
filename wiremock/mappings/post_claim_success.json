@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/api/claims"
+  },
+  "response": {
+    "status": 201,
+    "body": "{\"status\": \"Accepted\", \"message\": \"Claim CLM-99 received successfully\"}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
