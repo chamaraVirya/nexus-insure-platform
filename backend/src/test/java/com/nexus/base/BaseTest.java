@@ -10,6 +10,7 @@ public class BaseTest {
 
     protected static Properties config = new Properties();
 
+
     @BeforeSuite
     public void setup() {
         try {
