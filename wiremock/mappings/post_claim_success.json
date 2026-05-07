@@ -1,11 +1,12 @@
 {
+  "priority": 10,
   "request": {
     "method": "POST",
     "url": "/api/claims"
   },
   "response": {
     "status": 201,
-    "body": "{\"status\": \"Accepted\", \"message\": \"Claim CLM-99 received successfully\"}",
+    "body": "{\"status\": \"Accepted\", \"message\": \"Claim {{jsonPath request.body '$.claimId'}} processed successfully\"}",
     "headers": {
       "Content-Type": "application/json"
     }

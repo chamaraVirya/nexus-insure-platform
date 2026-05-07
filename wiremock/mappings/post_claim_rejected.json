@@ -1,0 +1,19 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "POST",
+    "url": "/api/claims",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": "$.[?(@.amount == 0 || @.amount == 0.0)]"
+      }
+    ]
+  },
+  "response": {
+    "status": 400,
+    "body": "{\"error\": \"InvalidAmount\", \"message\": \"Claim amount must be greater than zero.\"}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
