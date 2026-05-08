@@ -22,7 +22,7 @@ services:
     image: nginx:alpine # Using a lightweight proxy as a placeholder
     container_name: nexus_api
     ports:
-      - "8080:80"
+      - "8082:80"
     networks:
       - nexus_net
 
