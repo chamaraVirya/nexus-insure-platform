@@ -2,7 +2,9 @@ package com.nexus.api;
 
 import com.nexus.base.BaseTest;
 import com.nexus.models.Claim;
+import com.nexus.utils.ClaimValidator;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static io.restassured.RestAssured.*;
@@ -55,14 +57,12 @@ public class ClaimApiTest extends BaseTest {
 
         System.out.println(">> Testing Insurance Type: " + type);
 
-        given()
+        Response response = given()
                 .contentType(ContentType.JSON)
                 .body(claim)
                 .when()
-                .post("/api/claims")
-                .then()
-                .statusCode(201)
-                .body("status", equalTo("Accepted"));
+                .post("/api/claims");
+        ClaimValidator.assertSuccess(response, id);
 
     }
 
@@ -71,14 +71,14 @@ public class ClaimApiTest extends BaseTest {
         // A claim that should trigger our new stub
         Claim invalidClaim = new Claim("CLM-FAIL", "POL-000", 0.0, "REJECTED");
 
-        given()
+        Response response = given()
                 .contentType(ContentType.JSON)
                 .body(invalidClaim)
                 .when()
-                .post("/api/claims")
-                .then()
-                .statusCode(400) // Expecting the rejection code
-                .body("error", equalTo("InvalidAmount"));
+                .post("/api/claims");
+
+        ClaimValidator.assertRejection(response, "InvalidAmount");
+
     }
 
 }
