@@ -1,42 +1,59 @@
-version: '3.8'
-
 services:
-
-# Your existing Nginx service
-  nginx:
-    image: nginx:latest
-    ports:
-      - "8085:80" # Change from 8080:80 to 8085:80
-    volumes:
-      - ./html:/usr/share/nginx/html
-  # ADD THE NEW WIREMOCK SERVICE HERE
+  # --- Service Virtualization Layer ---
   wiremock:
     image: wiremock/wiremock:latest
+    container_name: nexus-wiremock
     ports:
-      - "8081:8080"
+      - "8081:8080" # Map Host 8081 to Container 8080
     volumes:
       - ./wiremock:/home/wiremock
-    command: ["--global-response-templating"]
-  
+    # Essential flags for stateful mocking and security bypass
+    command: ["--verbose", "--global-response-templating", "--disable-gzip"]
+    networks:
+      - nexus_net
+
+  # --- Application API Layer ---
   api:
     image: nginx:alpine # Using a lightweight proxy as a placeholder
     container_name: nexus_api
     ports:
       - "8082:80"
+    depends_on:
+      - wiremock  
     networks:
       - nexus_net
+  # nexus_api:
+  #   image: nexus-insure-api:latest
+  #   container_name: nexus-api
+  #   ports:
+  #     - "8082:8080" # Map Host 8082 to Container 8080 (Avoiding 8080 clash)
+  #   depends_on:
+  #     - wiremock
+  #   networks:
+  #     - nexus_net
 
-  # The Customer Portal (Mock/Frontend)
-  portal:
-    image: nginx:alpine
-    container_name: nexus_ui
+
+  # --- Frontend / Ingress Layer ---
+  nginx:
+    image: nginx:latest
+    container_name: nexus-ui
     ports:
-      - "3000:80"
+      - "8085:80" # Map Host 8085 to Container 80
+    volumes:
+      - ./html:/usr/share/nginx/html
     networks:
       - nexus_net
 
 networks:
   nexus_net:
     driver: bridge
-
-   
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  

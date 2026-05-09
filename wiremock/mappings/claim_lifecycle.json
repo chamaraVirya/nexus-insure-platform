@@ -1,0 +1,31 @@
+{
+  "mappings": [
+    {
+      "scenarioName": "Claim Lifecycle",
+      "requiredScenarioState": "Started",
+      "newScenarioState": "Claim Processed",
+      "request": {
+        "method": "GET",
+        "url": "/api/claims/CLM-STATE-01"
+      },
+      "response": {
+        "status": 200,
+        "body": "{\"claimId\": \"CLM-STATE-01\", \"status\": \"PENDING\"}",
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "scenarioName": "Claim Lifecycle",
+      "requiredScenarioState": "Claim Processed",
+      "request": {
+        "method": "GET",
+        "url": "/api/claims/CLM-STATE-01"
+      },
+      "response": {
+        "status": 200,
+        "body": "{\"claimId\": \"CLM-STATE-01\", \"status\": \"APPROVED\"}",
+        "headers": { "Content-Type": "application/json" }
+      }
+    }
+  ]
+}
