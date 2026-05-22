@@ -16,23 +16,23 @@ public class BaseTest {
 
     @BeforeSuite
     public void setup() {
-
         properties = new Properties();
         try (FileInputStream fis = new FileInputStream("src/test/resources/config.properties")) {
             properties.load(fis);
 
-            // Assigning variables from properties
+            // Force RestAssured to use the API port (8082)
             RestAssured.baseURI = properties.getProperty("base.uri");
+            // Pull the WireMock Admin port (8081)
             wiremockAdminUri = properties.getProperty("wiremock.admin.uri");
 
-            System.out.println(">> System Bootstrapped");
-            System.out.println(">> Target API: " + RestAssured.baseURI);
-            System.out.println(">> WireMock Admin: " + wiremockAdminUri);
+            System.out.println(">> [SYSTEM BOOT] Target API: " + RestAssured.baseURI);
+            System.out.println(">> [SYSTEM BOOT] WireMock Admin: " + wiremockAdminUri);
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load config.properties. Check file path!");
+            throw new RuntimeException("Critical: Could not load config.properties");
         }
     }
+
 
 
     @AfterMethod
