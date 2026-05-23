@@ -10,13 +10,13 @@ public class ClaimLifecycleTest extends BaseTest {
 
     @Test(description = "NEX-401: Verify claim status transition from PENDING to APPROVED")
     public void testClaimStatusTransition() {
-        // Maintain the verified literal routing path
-        RestAssured.baseURI = "http://127.0.0.1:8081";
         String claimId = "CLM-STATE-01";
 
-        System.out.println(">> [PHASE 1] Fetching initial state for: " + claimId);
+        System.out.println("DEBUG RUNTIME URL: [" + RestAssured.baseURI + "/api/claims/" + claimId + "]");
 
-        // Call 1: Baseline Verification (Expects PENDING and triggers state shift)
+        System.out.println(">> Target endpoint from configuration: " + RestAssured.baseURI);
+
+        // Phase 1: Verify Initial State (Fires the first mapping)
         given()
                 .header("Accept", "application/json")
                 .when()
@@ -26,9 +26,7 @@ public class ClaimLifecycleTest extends BaseTest {
                 .statusCode(200)
                 .body("status", equalTo("PENDING"));
 
-        System.out.println(">> [PHASE 2] Fetching mutated state for: " + claimId);
-
-        // Call 2: State Transition Verification (Expects APPROVED)
+        // Phase 2: Verify Mutated State (Fires the second mapping via Scenario state)
         given()
                 .header("Accept", "application/json")
                 .when()
@@ -38,7 +36,8 @@ public class ClaimLifecycleTest extends BaseTest {
                 .statusCode(200)
                 .body("status", equalTo("APPROVED"));
 
-        System.out.println(">> [SUCCESS] Finite State Machine transitioned smoothly.");
+        System.out.println(">> [SUCCESS] Verification complete for " + claimId);
     }
+
 }
 

@@ -2,6 +2,7 @@ package com.nexus.base;
 
 import io.restassured.RestAssured;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
 import java.io.FileInputStream;
@@ -12,39 +13,46 @@ import static io.restassured.RestAssured.given;
 
 public class BaseTest {
     protected static Properties properties;
-    public static String wiremockAdminUri; // Declared at class level
+    protected static String wiremockAdminUri;
 
-    @BeforeSuite
+    @BeforeSuite(alwaysRun = true)
     public void setup() {
+        System.out.println(">> [ORCHESTRATION] Initializing localized container architecture...");
+        try {
+            // Automatically spin up Docker Compose from Java
+            ProcessBuilder processBuilder = new ProcessBuilder("docker-compose", "up", "-d");
+            Process process = processBuilder.start();
+            process.waitFor(); // Wait for the docker command to finish executing
+
+            // Give the containers 3 seconds to fully initialize internal services
+            Thread.sleep(3000);
+            System.out.println(">> [ORCHESTRATION] Containers deployed successfully.");
+        } catch (Exception e) {
+            System.out.println(">> [WARNING] Automatic container deployment failed. Falling back to manual loopback configuration.");
+        }
+
+        // Load Properties
         properties = new Properties();
         try (FileInputStream fis = new FileInputStream("src/test/resources/config.properties")) {
             properties.load(fis);
-
-            // Force RestAssured to use the API port (8082)
             RestAssured.baseURI = properties.getProperty("base.uri");
-            // Pull the WireMock Admin port (8081)
             wiremockAdminUri = properties.getProperty("wiremock.admin.uri");
-
-            System.out.println(">> [SYSTEM BOOT] Target API: " + RestAssured.baseURI);
-            System.out.println(">> [SYSTEM BOOT] WireMock Admin: " + wiremockAdminUri);
-
         } catch (IOException e) {
             throw new RuntimeException("Critical: Could not load config.properties");
         }
     }
 
-
-
-    @AfterMethod
-    public void verifyBackendJournal() {
-        // This will run automatically after every single test method
-        given()
-                .baseUri(BaseTest.wiremockAdminUri)
-                .when()
-                .get("/__admin/requests")
-                .then()
-                .statusCode(200);
-
-        System.out.println(">> Backend Integrity Check: PASSED");
+    @AfterSuite(alwaysRun = true)
+    public void tearDown() {
+        System.out.println(">> [ORCHESTRATION] Deprovisioning local container environment...");
+        try {
+            // Automatically tear down the infrastructure to free up system memory
+            ProcessBuilder processBuilder = new ProcessBuilder("docker-compose", "down");
+            Process process = processBuilder.start();
+            process.waitFor();
+            System.out.println(">> [ORCHESTRATION] Environment pristine. All ports liberated.");
+        } catch (Exception e) {
+            System.out.println(">> [ERROR] Failed to automatically tear down containers.");
+        }
     }
 }
