@@ -1,0 +1,30 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/api/db/records\\?client_id=USR-99"
+      },
+      "response": {
+        "status": 200,
+        "body": "{\"table\": \"POLICY_HOLDERS\", \"rows\": [{\"id\": 99, \"name\": \"Alex Mercer\", \"status\": \"ACTIVE\", \"risk_score\": 0.12}]}",
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/api/db/records\\?client_id=USR-ERR"
+      },
+      "response": {
+        "status": 500,
+        "body": "{\"error\": \"SQLSTATE[HY000] [2002] Connection timed out\"}",
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
