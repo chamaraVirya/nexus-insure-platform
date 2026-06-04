@@ -1,0 +1,47 @@
+name: Nexus Automation CI Pipeline
+
+# Trigger the pipeline on every push or pull request to your main and feature branches
+on:
+  push:
+    branches: [ main, "feature/**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  integration-tests:
+    name: Execute Ephemeral Test Suite
+    runs-on: ubuntu-latest # Uses a clean, free Linux runner provided by GitHub
+
+    steps:
+      # Step 1: Check out the repository source code onto the runner
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Initialize the Java Development Kit (JDK 17)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # Step 3: Verify Docker and Docker Compose are present on the cloud runner
+      - name: Verify Cloud Container Environment
+        run: |
+          docker --version
+          docker-compose --version
+
+      # Step 4: Run the Maven Test Phase
+      # Because your BaseTest.java automatically handles 'docker-compose up' and 'down',
+      # the standard Maven command will natively trigger the entire container lifecycle!
+      - name: Run Stateful & Integration Tests
+        run: mvn clean test
+
+      # Step 5: Archive Test Reports (Saves your TestNG results so you can view them in the UI)
+      - name: Upload Test Artifacts
+        if: always() # Ensures reports are saved even if a test fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: testng-execution-report
+          path: target/surefire-reports/
+          retention-days: 5
